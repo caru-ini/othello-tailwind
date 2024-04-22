@@ -10,10 +10,10 @@ const stoneColor = [
   "bg-sky-300 drop-shadow-none hover:cursor-pointer",
 ];
 
-const stoneSizes = ["", "size-[80%]", "size-[80%]"];
+const stoneSizes = ["", "size-[75%]", "size-[75%]"];
 
 const possibleColor = "bg-sky-300 drop-shadow-none hover:cursor-pointer";
-const possibleSizes = "size-[40%]";
+const possibleSizes = "size-[30%]";
 
 type CellProps = {
   variant: stoneType;

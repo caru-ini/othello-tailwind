@@ -149,7 +149,7 @@ const Game: React.FC = () => {
 
 
   return (
-    <div className="flex flex-col md:flex-row justify-between gap-5 p-5 rounded-md border border-border size-full ">
+    <div className="flex flex-col md:flex-row justify-between gap-5 p-5 rounded-md border border-border size-full">
       <div className="flex flex-col gap-5 justify-center">
         <Menu onReset={() => reset()} player={player} count={count} />
       </div>

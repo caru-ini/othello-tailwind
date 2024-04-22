@@ -10,7 +10,7 @@ interface BoardProps {
 
 const Board: React.FC<BoardProps> = ({ board, possibleMoves , onClick }) => {
   return (
-    <div className="grid grid-cols-8 gap-2 h-full w-[60vmin] flex-grow">
+    <div className="grid grid-cols-8 gap-2 h-full md:w-[60vmin] flex-grow">
       {board.map((row, rowIndex) =>
         row.map((square, colIndex) => (
           <Cell

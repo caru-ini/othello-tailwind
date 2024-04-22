@@ -10,7 +10,7 @@ const stoneColor = [
   "bg-sky-300 drop-shadow-none hover:cursor-pointer",
 ];
 
-const stoneSizes = ["", "size-[90%]", "size-[90%]"];
+const stoneSizes = ["", "size-[80%]", "size-[80%]"];
 
 const possibleColor = "bg-sky-300 drop-shadow-none hover:cursor-pointer";
 const possibleSizes = "size-[40%]";

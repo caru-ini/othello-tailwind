@@ -1,6 +1,7 @@
 import { Button } from "../ui/button";
 import { RotateCcw } from "lucide-react";
 import { stoneType } from "./game";
+
 interface menuProps {
     onReset: () => void;
     player: stoneType
@@ -32,14 +33,14 @@ const Menu = ({ onReset, player, count }: menuProps) => {
             {/* count */}
             <div className="flex gap-3 flex-grow">
             <div className="flex gap-1">
-                <div className="w-2 rounded-full drop-shadow-md aspect-square bg-slate-600"/>
+                <div className="w-2 rounded-full drop-shadow-md bg-slate-600"/>
                 <div className="flex flex-col gap-1">
                 <h1 className="text-lg font-bold">Black</h1>
                 <h1 className="text-lg">{count.black}</h1>
                 </div>
             </div>
             <div className="flex gap-1">
-                <div className="w-2 rounded-full drop-shadow-md aspect-square bg-white"/>
+                <div className="w-2 rounded-full drop-shadow-md bg-white"/>
                 <div className="flex flex-col gap-1">
                 <h1 className="text-lg font-bold">White</h1>
                 <h1 className="text-lg">{count.white}</h1>

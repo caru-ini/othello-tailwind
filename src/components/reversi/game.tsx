@@ -23,6 +23,37 @@ const directions = [
   [-1, 1],
 ];
 
+const findStonesInDirection = (
+  board: stoneType[][],
+  player: stoneType,
+  col: number,
+  row: number,
+  dx: number,
+  dy: number
+): { foundOpponent: boolean, x: number, y: number } => {
+  let x = col + dx;
+  let y = row + dy;
+  let foundOpponent = false;
+
+  while (x >= 0 && x < 8 && y >= 0 && y < 8) {
+    const currentStone = board[y][x];
+
+    if (currentStone === 0) {
+      break;
+    }
+
+    if (currentStone === player) {
+      break;
+    }
+
+    foundOpponent = true;
+    x += dx;
+    y += dy;
+  }
+
+  return { foundOpponent, x, y };
+};
+
 const isValidMove = (
   board: stoneType[][],
   player: stoneType,
@@ -35,27 +66,10 @@ const isValidMove = (
 
   for (const direction of directions) {
     const [dx, dy] = direction;
-    let x = col + dx;
-    let y = row + dy;
-    let foundOpponent = false;
+    const { foundOpponent, x, y } = findStonesInDirection(board, player, col, row, dx, dy);
 
-    while (x >= 0 && x < 8 && y >= 0 && y < 8) {
-      const currentStone = board[y][x];
-
-      if (currentStone === 0) {
-        break;
-      }
-
-      if (currentStone === player) {
-        if (foundOpponent) {
-          return true;
-        }
-        break;
-      }
-
-      foundOpponent = true;
-      x += dx;
-      y += dy;
+    if (foundOpponent && board[y]?.[x] === player) {
+      return true;
     }
   }
 
@@ -74,39 +88,27 @@ const getAllValidMoves = (board: stoneType[][], player: stoneType): boolean[][] 
   return validMoves;
 };
 
-const flipStones = (
-  board: stoneType[][],
-  player: stoneType,
-  col: number,
-  row: number
-): stoneType[][] => {
-  const newBoard = board.map((row) => [...row]);
-  for (const [dx, dy] of directions) {
-    let x = col + dx;
-    let y = row + dy;
-    let found = false;
-    while (x >= 0 && x < 8 && y >= 0 && y < 8) {
-      if (newBoard[y][x] === 0) break;
-      if (newBoard[y][x] === player) {
-        found = true;
-        break;
-      }
-      x += dx;
-      y += dy;
-    }
-    if (found) {
-      x = col + dx;
-      y = row + dy;
-      while (newBoard[y][x] !== player) {
-        newBoard[y][x] = player;
-        x += dx;
-        y += dy;
+const flipStones = (board: stoneType[][], player: stoneType, col: number, row: number): stoneType[][] => {
+  const newBoard = [...board];
+
+  for (const direction of directions) {
+    const [dx, dy] = direction;
+    const { foundOpponent, x, y } = findStonesInDirection(board, player, col, row, dx, dy);
+
+    if (foundOpponent && board[y]?.[x] === player) {
+      let flipX = col + dx;
+      let flipY = row + dy;
+
+      while (flipX !== x || flipY !== y) {
+        newBoard[flipY][flipX] = player;
+        flipX += dx;
+        flipY += dy;
       }
     }
   }
-  newBoard[row][col] = player;
+
   return newBoard;
-};
+}
 
 const Game: React.FC = () => {
   // two dimensional [8][8] array
@@ -116,17 +118,11 @@ const Game: React.FC = () => {
   // winner
   const [winner, setWinner] = React.useState<stoneType | null>(null);
 
-  const count = board.flat().reduce(
-    (acc, stone) => {
-      if (stone === 1) {
-        acc.black++;
-      } else if (stone === 2) {
-        acc.white++;
-      }
-      return acc;
-    },
-    { black: 0, white: 0 }
-  );
+  const count = board.flat().reduce((acc, stone) => {
+    if (stone === 1) acc.black++;
+    else if (stone === 2) acc.white++;
+    return acc;
+  }, { black: 0, white: 0 });
   
   const [possibleMoves, setPossibleMoves] = React.useState<boolean[][]>(getAllValidMoves(board, 1));
   const clickHandler = (x: number, y: number) => {

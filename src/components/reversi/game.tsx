@@ -92,9 +92,9 @@ const getAllValidMoves = (
 
   while (true) {
     x = 0;
-    if (y >= 8) break;
+    if (y > 8) break;
     while (true) {
-      if (x >= 8) break;
+      if (x > 8) break;
       validMoves[y][x] = isValidMove(board, player, x, y);
       x++;
     }

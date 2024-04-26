@@ -1,12 +1,13 @@
 "use client";
-import React  from "react";
+import React from "react";
 import Board from "./board";
 import Menu from "./menu";
 
 export type stoneType = 0 | 1 | 2 | 3; // 0: null, 1: black, 2: white, 3: possible
 
-
-const defaultBoard: stoneType[][] = Array.from({ length: 8 }, () => Array(8).fill(0));
+const defaultBoard: stoneType[][] = Array.from({ length: 8 }, () =>
+  Array(8).fill(0)
+);
 defaultBoard[3][4] = 1;
 defaultBoard[4][3] = 1;
 defaultBoard[3][3] = 2;
@@ -30,19 +31,16 @@ const findStonesInDirection = (
   row: number,
   dx: number,
   dy: number
-): { foundOpponent: boolean, x: number, y: number } => {
+): { foundOpponent: boolean; x: number; y: number } => {
   let x = col + dx;
   let y = row + dy;
   let foundOpponent = false;
 
-  while (x >= 0 && x < 8 && y >= 0 && y < 8) {
+  while (true) {
+    const row = board[y];
+    if (!row) break;
     const currentStone = board[y][x];
-
-    if (currentStone === 0) {
-      break;
-    }
-
-    if (currentStone === player) {
+    if (currentStone === undefined || currentStone === 0 || currentStone === player) {
       break;
     }
 
@@ -58,7 +56,7 @@ const isValidMove = (
   board: stoneType[][],
   player: stoneType,
   col: number,
-  row: number,
+  row: number
 ): boolean => {
   if (board[row][col] !== 0) {
     return false;
@@ -66,7 +64,14 @@ const isValidMove = (
 
   for (const direction of directions) {
     const [dx, dy] = direction;
-    const { foundOpponent, x, y } = findStonesInDirection(board, player, col, row, dx, dy);
+    const { foundOpponent, x, y } = findStonesInDirection(
+      board,
+      player,
+      col,
+      row,
+      dx,
+      dy
+    );
 
     if (foundOpponent && board[y]?.[x] === player) {
       return true;
@@ -76,24 +81,47 @@ const isValidMove = (
   return false;
 };
 
-const getAllValidMoves = (board: stoneType[][], player: stoneType): boolean[][] => {
+const getAllValidMoves = (
+  board: stoneType[][],
+  player: stoneType
+): boolean[][] => {
   const validMoves = Array.from({ length: 8 }, () => Array(8).fill(false));
 
-  for (let y = 0; y < 8; y++) {
-    for (let x = 0; x < 8; x++) {
+  let x = 0;
+  let y = 0;
+
+  while (true) {
+    x = 0;
+    if (y >= 8) break;
+    while (true) {
+      if (x >= 8) break;
       validMoves[y][x] = isValidMove(board, player, x, y);
+      x++;
     }
+    y++;
   }
 
   return validMoves;
 };
 
-const flipStones = (board: stoneType[][], player: stoneType, col: number, row: number): stoneType[][] => {
-  const newBoard = [...board];
+const flipStones = (
+  board: stoneType[][],
+  player: stoneType,
+  col: number,
+  row: number
+): stoneType[][] => {
+  const newBoard = structuredClone(board);
 
   for (const direction of directions) {
     const [dx, dy] = direction;
-    const { foundOpponent, x, y } = findStonesInDirection(board, player, col, row, dx, dy);
+    const { foundOpponent, x, y } = findStonesInDirection(
+      board,
+      player,
+      col,
+      row,
+      dx,
+      dy
+    );
 
     if (foundOpponent && board[y]?.[x] === player) {
       let flipX = col + dx;
@@ -108,7 +136,7 @@ const flipStones = (board: stoneType[][], player: stoneType, col: number, row: n
   }
 
   return newBoard;
-}
+};
 
 const Game: React.FC = () => {
   // two dimensional [8][8] array
@@ -118,13 +146,18 @@ const Game: React.FC = () => {
   // winner
   const [winner, setWinner] = React.useState<stoneType | null>(null);
 
-  const count = board.flat().reduce((acc, stone) => {
-    if (stone === 1) acc.black++;
-    else if (stone === 2) acc.white++;
-    return acc;
-  }, { black: 0, white: 0 });
-  
-  const [possibleMoves, setPossibleMoves] = React.useState<boolean[][]>(getAllValidMoves(board, 1));
+  const count = board.flat().reduce(
+    (acc, stone) => {
+      if (stone === 1) acc.black++;
+      else if (stone === 2) acc.white++;
+      return acc;
+    },
+    { black: 0, white: 0 }
+  );
+
+  const [possibleMoves, setPossibleMoves] = React.useState<boolean[][]>(
+    getAllValidMoves(board, 1)
+  );
   const clickHandler = (x: number, y: number) => {
     if (!isValidMove(board, player, x, y)) {
       return;
@@ -141,15 +174,18 @@ const Game: React.FC = () => {
     setPossibleMoves(getAllValidMoves(defaultBoard, 1));
     setPlayer(1);
     setWinner(null);
-  }
-
+  };
 
   return (
     <div className="flex flex-col md:flex-row justify-between gap-5 p-5 rounded-md border border-border size-full">
       <div className="flex flex-col gap-5 justify-center">
         <Menu onReset={() => reset()} player={player} count={count} />
       </div>
-      <Board board={board} possibleMoves={possibleMoves} onClick={clickHandler} />
+      <Board
+        board={board}
+        possibleMoves={possibleMoves}
+        onClick={clickHandler}
+      />
     </div>
   );
 };

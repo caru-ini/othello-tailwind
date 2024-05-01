@@ -40,7 +40,11 @@ const findStonesInDirection = (
     const row = board[y];
     if (!row) break;
     const currentStone = board[y][x];
-    if (currentStone === undefined || currentStone === 0 || currentStone === player) {
+    if (
+      currentStone === undefined ||
+      currentStone === 0 ||
+      currentStone === player
+    ) {
       break;
     }
 
@@ -92,9 +96,9 @@ const getAllValidMoves = (
 
   while (true) {
     x = 0;
-    if (y > 8) break;
+    if (y > 7) break;
     while (true) {
-      if (x > 8) break;
+      if (x > 7) break;
       validMoves[y][x] = isValidMove(board, player, x, y);
       x++;
     }

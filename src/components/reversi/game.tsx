@@ -189,7 +189,6 @@ const Game: React.FC = () => {
 
   const reset = () => {
     const newBoard = structuredClone(defaultBoard);
-    updateValidMoves(newBoard, 1);
     setBoard(newBoard);
     setPlayer(1);
     setWinner(null);

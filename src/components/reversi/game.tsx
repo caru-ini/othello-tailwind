@@ -4,6 +4,7 @@ import Board from "./board";
 import Menu from "./menu";
 
 export type stoneType = 0 | 1 | 2 | 3; // 0: null, 1: black, 2: white, 3: possible
+export type playerType = 0 | 1 | 2 | 3 | 4; // 0: draw 1: black, 2: white, 3: black win, 4: white win
 
 const defaultBoard: stoneType[][] = Array.from({ length: 8 }, () =>
   Array(8).fill(0)
@@ -30,7 +31,7 @@ const directions = [
 
 const findStonesInDirection = (
   board: stoneType[][],
-  player: stoneType,
+  player: playerType,
   col: number,
   row: number,
   dx: number,
@@ -60,7 +61,7 @@ const findStonesInDirection = (
 
 const isValidMove = (
   board: stoneType[][],
-  player: stoneType,
+  player: playerType,
   col: number,
   row: number
 ): boolean => {
@@ -89,7 +90,7 @@ const isValidMove = (
 
 const getAllValidMoves = (
   board: stoneType[][],
-  player: stoneType
+  player: playerType
 ): boolean[][] => {
   const validMoves = Array.from({ length: 8 }, () => Array(8).fill(false));
 
@@ -110,7 +111,7 @@ const getAllValidMoves = (
 
 const flipStones = (
   board: stoneType[][],
-  player: stoneType,
+  player: playerType,
   col: number,
   row: number
 ): stoneType[][] => {
@@ -148,7 +149,7 @@ const getCleanBoard = (board: stoneType[][]): stoneType[][] => {
   return board.map((row) => row.map((cell) => trans[cell] as stoneType));
 };
 
-const updateValidMoves = (board: stoneType[][], player: stoneType) => {
+const updateValidMoves = (board: stoneType[][], player: playerType) => {
   const validMoves = getAllValidMoves(board, player);
   validMoves.forEach((row, y) => {
     row.forEach((valid, x) => {
@@ -163,34 +164,51 @@ const Game: React.FC = () => {
   // two dimensional [8][8] array
   const [board, setBoard] = React.useState(defaultBoard);
   // current player
-  const [player, setPlayer] = React.useState<stoneType>(1);
-  // winner
-  const [winner, setWinner] = React.useState<stoneType | null>(null);
+  const [player, setPlayer] = React.useState<playerType>(1);
 
   const count = board.flat().reduce(
-    (acc, stone) => {
-      if (stone === 1) acc[0]++;
-      else if (stone === 2) acc[1]++;
+    (acc, cur) => {
+      acc[cur]++;
       return acc;
     },
-    [0, 0] as [number, number]
+    [0, 0, 0, 0] as [number, number, number, number]
   );
 
   const clickHandler = (x: number, y: number) => {
     if (board[y][x] !== 3) return;
     const newBoard = flipStones(getCleanBoard(board), player, x, y);
-    newBoard[y][x] = player;
-    updateValidMoves(newBoard, (2 / player) as stoneType);
+    newBoard[y][x] = player as stoneType;
+    updateValidMoves(newBoard, (2 / player) as playerType);
     console.log(newBoard);
+    // if no valid moves, check next next player has valid moves
+    if (newBoard.flat().filter((cell) => cell === 3).length === 0) {
+      updateValidMoves(newBoard, player);
+      if (newBoard.flat().filter((cell) => cell === 3).length === 0) {
+        let black = count[1];
+        let white = count[2];
+        console.log(black > white);
+        if (black > white) {
+          setPlayer(3);
+        } else if (black < white) {
+          setPlayer(4);
+        } else {
+          setPlayer(0);
+        }
+        setBoard(newBoard);
+        return;
+      }
+      setPlayer((2 / player) as playerType);
+      setBoard(newBoard);
+      return;
+    }
     setBoard(newBoard);
-    setPlayer((2 / player) as stoneType);
+    setPlayer((2 / player) as playerType);
   };
 
   const reset = () => {
     const newBoard = structuredClone(defaultBoard);
     setBoard(newBoard);
     setPlayer(1);
-    setWinner(null);
   };
 
   return (

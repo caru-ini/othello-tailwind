@@ -143,8 +143,9 @@ const flipStones = (
 };
 
 const getCleanBoard = (board: stoneType[][]): stoneType[][] => {
+  const trans = [0, 1, 2, 0];
   // get board that filtered 3
-  return board.map((row) => row.map((cell) => (cell === 3 ? 0 : cell)));
+  return board.map((row) => row.map((cell) => trans[cell] as stoneType));
 };
 
 const updateValidMoves = (board: stoneType[][], player: stoneType) => {

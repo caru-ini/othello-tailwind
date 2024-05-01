@@ -12,6 +12,10 @@ defaultBoard[3][4] = 1;
 defaultBoard[4][3] = 1;
 defaultBoard[3][3] = 2;
 defaultBoard[4][4] = 2;
+defaultBoard[3][2] = 3;
+defaultBoard[2][3] = 3;
+defaultBoard[5][4] = 3;
+defaultBoard[4][5] = 3;
 
 const directions = [
   [0, 1],
@@ -94,11 +98,9 @@ const getAllValidMoves = (
   let x = 0;
   let y = 0;
 
-  while (true) {
+  while (y < 8) {
     x = 0;
-    if (y > 7) break;
-    while (true) {
-      if (x > 7) break;
+    while (x < 8) {
       validMoves[y][x] = isValidMove(board, player, x, y);
       x++;
     }
@@ -142,6 +144,22 @@ const flipStones = (
   return newBoard;
 };
 
+const getCleanBoard = (board: stoneType[][]): stoneType[][] => {
+  // get board that filtered 3
+  return board.map((row) => row.map((cell) => (cell === 3 ? 0 : cell)));
+};
+
+const updateValidMoves = (board: stoneType[][], player: stoneType) => {
+  const validMoves = getAllValidMoves(board, player);
+  validMoves.forEach((row, y) => {
+    row.forEach((valid, x) => {
+      if (valid) {
+        board[y][x] = 3;
+      }
+    });
+  });
+};
+
 const Game: React.FC = () => {
   // two dimensional [8][8] array
   const [board, setBoard] = React.useState(defaultBoard);
@@ -152,30 +170,27 @@ const Game: React.FC = () => {
 
   const count = board.flat().reduce(
     (acc, stone) => {
-      if (stone === 1) acc.black++;
-      else if (stone === 2) acc.white++;
+      if (stone === 1) acc[0]++;
+      else if (stone === 2) acc[1]++;
       return acc;
     },
-    { black: 0, white: 0 }
+    [0, 0] as [number, number]
   );
 
-  const [possibleMoves, setPossibleMoves] = React.useState<boolean[][]>(
-    getAllValidMoves(board, 1)
-  );
   const clickHandler = (x: number, y: number) => {
-    if (!isValidMove(board, player, x, y)) {
-      return;
-    }
-    const newBoard = flipStones([...board], player, x, y);
+    if (board[y][x] !== 3) return;
+    const newBoard = flipStones(getCleanBoard(board), player, x, y);
     newBoard[y][x] = player;
+    updateValidMoves(newBoard, (2 / player) as stoneType);
+    console.log(newBoard);
     setBoard(newBoard);
-    setPlayer((3 - player) as stoneType);
-    setPossibleMoves(getAllValidMoves(newBoard, (3 - player) as stoneType));
+    setPlayer((2 / player) as stoneType);
   };
 
   const reset = () => {
-    setBoard(defaultBoard);
-    setPossibleMoves(getAllValidMoves(defaultBoard, 1));
+    const newBoard = structuredClone(defaultBoard);
+    updateValidMoves(newBoard, 1);
+    setBoard(newBoard);
     setPlayer(1);
     setWinner(null);
   };
@@ -185,11 +200,7 @@ const Game: React.FC = () => {
       <div className="flex flex-col gap-5 justify-center">
         <Menu onReset={() => reset()} player={player} count={count} />
       </div>
-      <Board
-        board={board}
-        possibleMoves={possibleMoves}
-        onClick={clickHandler}
-      />
+      <Board board={board} onClick={clickHandler} />
     </div>
   );
 };

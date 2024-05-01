@@ -41,9 +41,7 @@ const findStonesInDirection = (
   let foundOpponent = false;
 
   while (true) {
-    const row = board[y];
-    if (!row) break;
-    const currentStone = board[y][x];
+    const currentStone = board[y]?.[x];
     if (
       currentStone === undefined ||
       currentStone === 0 ||

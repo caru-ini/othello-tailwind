@@ -96,9 +96,9 @@ const getAllValidMoves = (
   let x = 0;
   let y = 0;
 
-  while (y < 8) {
+  for (const row of board) {
     x = 0;
-    while (x < 8) {
+    for (const _ of row) {
       validMoves[y][x] = isValidMove(board, player, x, y);
       x++;
     }

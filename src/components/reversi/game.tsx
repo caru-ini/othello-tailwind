@@ -41,6 +41,7 @@ const findStonesInDirection = (
   let y = row + dy;
   let foundOpponent = false;
 
+  // scan in the provided direction
   while (true) {
     const currentStone = board[y]?.[x];
     if (
@@ -66,6 +67,7 @@ const isValidMove = (
   row: number
 ): number => {
   board = getCleanBoard(board);
+
   if (board[row][col] !== 0) {
     return board[row][col];
   }
@@ -97,7 +99,7 @@ const flipStones = (
 ): stoneType[][] => {
   const newBoard = structuredClone(board);
 
-  for (const direction of directions) {
+  directions.forEach((direction) => {
     const [dx, dy] = direction;
     const { foundOpponent, x, y } = findStonesInDirection(
       board,
@@ -112,13 +114,14 @@ const flipStones = (
       let flipX = col + dx;
       let flipY = row + dy;
 
-      while (flipX !== x || flipY !== y) {
+      while (true) {
+        if (newBoard[flipY][flipX] === player) break;
         newBoard[flipY][flipX] = player;
         flipX += dx;
         flipY += dy;
       }
     }
-  }
+  });
 
   return newBoard;
 };
@@ -153,6 +156,7 @@ const Game: React.FC = () => {
       return acc;
     },
     [0, 0, 0, 0] as [number, number, number, number]
+    // 0: null, 1: black, 2: white, 3: possible
   );
 
   const clickHandler = (x: number, y: number) => {
@@ -161,25 +165,24 @@ const Game: React.FC = () => {
     newBoard[y][x] = player as stoneType;
     updateValidMoves(newBoard, (2 / player) as playerType);
     console.log(newBoard);
+
     // if no valid moves, check next next player has valid moves
-    if (shouldSkip(newBoard, (2 / player) as playerType)) {
+    const nextPlayer = (2 / player) as playerType;
+    if (shouldSkip(newBoard, nextPlayer)) {
       updateValidMoves(newBoard, player);
       if (shouldSkip(newBoard, player)) {
-        let black = count[1];
-        let white = count[2];
-        const trans = [0, 1, 2, 0];
-        setPlayer(
-          [3, 4, 0][+(black >= white) + +(black === white)] as playerType
-        );
-        setBoard(newBoard);
-        return;
+        const [black, white] = count.slice(1, 3);
+        const winner = [4, 3, 0][
+          +(black >= white) + +(black === white)
+        ] as playerType;
+        setPlayer(winner);
+      } else {
+        setPlayer(nextPlayer);
       }
-      setPlayer((2 / player) as playerType);
-      setBoard(newBoard);
-      return;
+    } else {
+      setPlayer(nextPlayer);
     }
     setBoard(newBoard);
-    setPlayer((2 / player) as playerType);
   };
 
   const reset = () => {

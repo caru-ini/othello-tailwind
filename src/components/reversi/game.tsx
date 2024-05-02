@@ -64,9 +64,10 @@ const isValidMove = (
   player: playerType,
   col: number,
   row: number
-): boolean => {
+): number => {
+  board = getCleanBoard(board);
   if (board[row][col] !== 0) {
-    return false;
+    return board[row][col];
   }
 
   for (const direction of directions) {
@@ -81,32 +82,11 @@ const isValidMove = (
     );
 
     if (foundOpponent && board[y]?.[x] === player) {
-      return true;
+      return 3;
     }
   }
 
-  return false;
-};
-
-const getAllValidMoves = (
-  board: stoneType[][],
-  player: playerType
-): boolean[][] => {
-  const validMoves = Array.from({ length: 8 }, () => Array(8).fill(false));
-
-  let x = 0;
-  let y = 0;
-
-  for (const row of board) {
-    x = 0;
-    for (const _ of row) {
-      validMoves[y][x] = isValidMove(board, player, x, y);
-      x++;
-    }
-    y++;
-  }
-
-  return validMoves;
+  return board[row][col];
 };
 
 const flipStones = (
@@ -150,12 +130,9 @@ const getCleanBoard = (board: stoneType[][]): stoneType[][] => {
 };
 
 const updateValidMoves = (board: stoneType[][], player: playerType) => {
-  const validMoves = getAllValidMoves(board, player);
-  validMoves.forEach((row, y) => {
-    row.forEach((valid, x) => {
-      if (valid) {
-        board[y][x] = 3;
-      }
+  board.forEach((row, y) => {
+    row.forEach((_, x) => {
+      board[y][x] = isValidMove(board, player, x, y) as stoneType;
     });
   });
 };
@@ -189,11 +166,14 @@ const Game: React.FC = () => {
         console.log(black > white);
         if (black > white) {
           setPlayer(3);
+          setBoard(newBoard);
+          return;
         } else if (black < white) {
           setPlayer(4);
-        } else {
-          setPlayer(0);
+          setBoard(newBoard);
+          return;
         }
+        setPlayer(0);
         setBoard(newBoard);
         return;
       }

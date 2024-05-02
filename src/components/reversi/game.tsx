@@ -137,6 +137,10 @@ const updateValidMoves = (board: stoneType[][], player: playerType) => {
   });
 };
 
+const shouldSkip = (board: stoneType[][], player: playerType): boolean => {
+  return board.flat().filter((cell) => cell === 3).length === 0;
+};
+
 const Game: React.FC = () => {
   // two dimensional [8][8] array
   const [board, setBoard] = React.useState(defaultBoard);
@@ -158,22 +162,15 @@ const Game: React.FC = () => {
     updateValidMoves(newBoard, (2 / player) as playerType);
     console.log(newBoard);
     // if no valid moves, check next next player has valid moves
-    if (newBoard.flat().filter((cell) => cell === 3).length === 0) {
+    if (shouldSkip(newBoard, (2 / player) as playerType)) {
       updateValidMoves(newBoard, player);
-      if (newBoard.flat().filter((cell) => cell === 3).length === 0) {
+      if (shouldSkip(newBoard, player)) {
         let black = count[1];
         let white = count[2];
-        console.log(black > white);
-        if (black > white) {
-          setPlayer(3);
-          setBoard(newBoard);
-          return;
-        } else if (black < white) {
-          setPlayer(4);
-          setBoard(newBoard);
-          return;
-        }
-        setPlayer(0);
+        const trans = [0, 1, 2, 0];
+        setPlayer(
+          [3, 4, 0][+(black >= white) + +(black === white)] as playerType
+        );
         setBoard(newBoard);
         return;
       }

@@ -145,9 +145,7 @@ const shouldSkip = (board: stoneType[][], player: playerType): boolean => {
 };
 
 const Game: React.FC = () => {
-  // two dimensional [8][8] array
   const [board, setBoard] = React.useState(defaultBoard);
-  // current player
   const [player, setPlayer] = React.useState<playerType>(1);
 
   const count = board.flat().reduce(

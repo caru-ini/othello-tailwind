@@ -44,11 +44,7 @@ const findStonesInDirection = (
   // scan in the provided direction
   while (true) {
     const currentStone = board[y]?.[x];
-    if (
-      currentStone === undefined ||
-      currentStone === 0 ||
-      currentStone === player
-    ) {
+    if (!currentStone || currentStone === player) {
       break;
     }
 
@@ -123,6 +119,7 @@ const flipStones = (
     }
   });
 
+  newBoard[row][col] = player as stoneType;
   return newBoard;
 };
 
@@ -141,45 +138,52 @@ const updateValidMoves = (board: stoneType[][], player: playerType) => {
 };
 
 const shouldSkip = (board: stoneType[][], player: playerType): boolean => {
-  return board.flat().filter((cell) => cell === 3).length === 0;
+  return !Boolean(getCount(board)[3]);
+};
+
+const getCount = (board: stoneType[][]): [number, number, number, number] => {
+  return board.flat().reduce(
+    (acc, cur) => {
+      acc[cur]++;
+      return acc;
+    },
+    [0, 0, 0, 0] as [number, number, number, number]
+    // 0: null, 1: black, 2: white, 3: available
+  );
 };
 
 const Game: React.FC = () => {
   const [board, setBoard] = React.useState(defaultBoard);
   const [player, setPlayer] = React.useState<playerType>(1);
 
-  const count = board.flat().reduce(
-    (acc, cur) => {
-      acc[cur]++;
-      return acc;
-    },
-    [0, 0, 0, 0] as [number, number, number, number]
-    // 0: null, 1: black, 2: white, 3: possible
-  );
+  const count = getCount(board);
 
   const clickHandler = (x: number, y: number) => {
     if (board[y][x] !== 3) return;
     const newBoard = flipStones(getCleanBoard(board), player, x, y);
-    newBoard[y][x] = player as stoneType;
     updateValidMoves(newBoard, (2 / player) as playerType);
-    console.log(newBoard);
 
     // if no valid moves, check next next player has valid moves
     const nextPlayer = (2 / player) as playerType;
-    if (shouldSkip(newBoard, nextPlayer)) {
+
+    const determineWinner = () => {
+      const [black, white] = count.slice(1, 3);
+      const winner = [4, 3, 0][
+        +(black >= white) + +(black === white)
+      ] as playerType;
+      setPlayer(winner);
+    };
+
+    const shouldSkipNextPlayer = shouldSkip(newBoard, nextPlayer);
+    const shouldSkipExtraPlayer = shouldSkip(newBoard, player);
+
+    if (shouldSkipNextPlayer) {
       updateValidMoves(newBoard, player);
-      if (shouldSkip(newBoard, player)) {
-        const [black, white] = count.slice(1, 3);
-        const winner = [4, 3, 0][
-          +(black >= white) + +(black === white)
-        ] as playerType;
-        setPlayer(winner);
-      } else {
-        setPlayer(nextPlayer);
-      }
-    } else {
-      setPlayer(nextPlayer);
     }
+    if (shouldSkipExtraPlayer && shouldSkipNextPlayer) {
+      determineWinner();
+    }
+    setPlayer(shouldSkipNextPlayer ? player : nextPlayer);
     setBoard(newBoard);
   };
 

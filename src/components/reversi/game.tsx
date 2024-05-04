@@ -175,13 +175,14 @@ const Game: React.FC = () => {
     };
 
     const shouldSkipNextPlayer = shouldSkip(newBoard, nextPlayer);
-    const shouldSkipExtraPlayer = shouldSkip(newBoard, player);
-
     if (shouldSkipNextPlayer) {
       updateValidMoves(newBoard, player);
     }
+    const shouldSkipExtraPlayer = shouldSkip(newBoard, player);
     if (shouldSkipExtraPlayer && shouldSkipNextPlayer) {
       determineWinner();
+      setBoard(newBoard);
+      return;
     }
     setPlayer(shouldSkipNextPlayer ? player : nextPlayer);
     setBoard(newBoard);

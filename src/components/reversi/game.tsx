@@ -6,17 +6,16 @@ import Menu from "./menu";
 export type stoneType = 0 | 1 | 2 | 3; // 0: null, 1: black, 2: white, 3: possible
 export type playerType = 0 | 1 | 2 | 3 | 4; // 0: draw 1: black, 2: white, 3: black win, 4: white win
 
-const defaultBoard: stoneType[][] = Array.from({ length: 8 }, () =>
-  Array(8).fill(0)
-);
-defaultBoard[3][4] = 1;
-defaultBoard[4][3] = 1;
-defaultBoard[3][3] = 2;
-defaultBoard[4][4] = 2;
-defaultBoard[3][2] = 3;
-defaultBoard[2][3] = 3;
-defaultBoard[5][4] = 3;
-defaultBoard[4][5] = 3;
+const defaultBoard: stoneType[][] = [
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 3, 0, 0, 0, 0],
+  [0, 0, 3, 2, 1, 0, 0, 0],
+  [0, 0, 0, 1, 2, 3, 0, 0],
+  [0, 0, 0, 0, 3, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+];
 
 const directions = [
   [0, 1],

@@ -20,7 +20,7 @@ const Menu = ({ onReset, player, count }: menuProps) => {
     <div className="flex flex-col justify-between gap-2 border border-border p-5 rounded-md bg-sky-100">
       <div className="flex md:justify-between items-center gap-3">
         <div
-          className={`aspect-square drop-shadow-md w-12 ${playerColor[player]}`}
+          className={`aspect-square drop-shadow-md w-12 duration-100 transition-all ${playerColor[player]}`}
         ></div>
         {/* title */}
         <div className="flex flex-col">

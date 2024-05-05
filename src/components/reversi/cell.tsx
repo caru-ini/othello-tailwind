@@ -24,6 +24,7 @@ const Cell: React.FC<CellProps> = ({ variant, onClick }) => {
           className={`aspect-square rounded-full ${
             stoneStyles[variant as number]
           }`}
+          style={{ transition: "all 0.2s" }}
         ></div>
       }
     </div>

@@ -36,23 +36,20 @@ const findStonesInDirection = (
   dx: number,
   dy: number
 ): { foundOpponent: boolean; x: number; y: number } => {
-  let x = col + dx;
-  let y = row + dy;
-  let foundOpponent = false;
+  const result = { foundOpponent: false, x: col + dx, y: row + dy };
 
   // scan in the provided direction
   while (true) {
-    const currentStone = board[y]?.[x];
+    const currentStone = board[result.y]?.[result.x];
     if (!currentStone || currentStone === player) {
       break;
     }
-
-    foundOpponent = true;
-    x += dx;
-    y += dy;
+    result.foundOpponent = true;
+    result.x += dx;
+    result.y += dy;
   }
 
-  return { foundOpponent, x, y };
+  return result;
 };
 
 const isValidMove = (
@@ -106,14 +103,13 @@ const flipStones = (
     );
 
     if (foundOpponent && board[y]?.[x] === player) {
-      let flipX = col + dx;
-      let flipY = row + dy;
+      const flip = [col + dx, row + dy];
 
       while (true) {
-        if (newBoard[flipY][flipX] === player) break;
-        newBoard[flipY][flipX] = player;
-        flipX += dx;
-        flipY += dy;
+        if (newBoard[flip[1]][flip[0]] === player) break;
+        newBoard[flip[1]][flip[0]] = player;
+        flip[0] += dx;
+        flip[1] += dy;
       }
     }
   });
